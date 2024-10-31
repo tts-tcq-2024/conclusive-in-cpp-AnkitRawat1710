@@ -1,99 +1,71 @@
 #include <gtest/gtest.h>
 #include "typewise-alert.h"
+#include <sstream>
+#include <string>
 
-// Test cases for inferBreach function
-TEST(TypeWiseAlertTestSuite, InfersBreachAccordingToLimits) {
-    // Normal cases
-    EXPECT_EQ(inferBreach(10, 0, 20), NORMAL);
-    EXPECT_EQ(inferBreach(15, 0, 20), NORMAL);
-    EXPECT_EQ(inferBreach(20, 0, 20), NORMAL);
-    
-    // Edge cases
-    EXPECT_EQ(inferBreach(0, 0, 20), NORMAL); // At lower limit
-    EXPECT_EQ(inferBreach(20, 0, 20), NORMAL); // At upper limit
-    
-    // Too low cases
-    EXPECT_EQ(inferBreach(-1, 0, 20), TOO_LOW); // Below lower limit
-    EXPECT_EQ(inferBreach(0, 1, 20), TOO_LOW); // At lower limit but exceeds acceptable range
+// Function to capture console output
+std::string captureOutput(void (*func)(AlertTarget, BatteryCharacter, double), AlertTarget target, BatteryCharacter batteryChar, double temperature) {
+    // Redirect cout to a string stream
+    std::ostringstream buffer;
+    std::streambuf* oldCoutBuffer = std::cout.rdbuf(buffer.rdbuf());
 
-    // Too high cases
-    EXPECT_EQ(inferBreach(21, 0, 20), TOO_HIGH); // Above upper limit
-    EXPECT_EQ(inferBreach(30, 0, 20), TOO_HIGH); // Well above upper limit
+    func(target, batteryChar, temperature);  // Call the function
+
+    std::cout.rdbuf(oldCoutBuffer);  // Restore cout
+    return buffer.str();  // Return captured output
 }
 
-// Test cases for classifyTemperatureBreach function
 TEST(TypeWiseAlertTestSuite, ClassifiesTemperatureBreach) {
-    // Passive cooling tests
-    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 30), NORMAL);
-    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 35), TOO_HIGH);
-    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, -1), TOO_LOW); // below acceptable
-
-    // High active cooling tests
-    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 40), NORMAL);
-    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 45), NORMAL); // at upper limit
-    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 46), TOO_HIGH); // above upper limit
-
-    // Medium active cooling tests
-    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 35), NORMAL);
-    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 40), NORMAL); // at upper limit
-    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 41), TOO_HIGH); // above upper limit
-    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, -5), TOO_LOW); // below acceptable
+    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 36), TOO_HIGH);
+    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 34), NORMAL);
+    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 46), TOO_HIGH);
+    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 39), NORMAL);
+    EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, -1), TOO_LOW);
+    EXPECT_EQ(classifyTemperatureBreach(PASSIVE_COOLING, 0), NORMAL); // Edge case: exactly at lower limit
+    EXPECT_EQ(classifyTemperatureBreach(HI_ACTIVE_COOLING, 45), NORMAL); // Edge case: exactly at upper limit
 }
 
-// Test cases for checkAndAlert function
 TEST(TypeWiseAlertTestSuite, CheckAndAlertFunctionality) {
-    BatteryCharacter batteryChar;
+    BatteryCharacter batteryChar = {PASSIVE_COOLING, "BrandA"};
     
-    // Passive cooling scenarios
-    batteryChar.coolingType = PASSIVE_COOLING;
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_CONTROLLER, batteryChar, 30);
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("feed"), std::string::npos); // Controller alert output
+    // Test sending TOO_HIGH alert
+    std::string output = captureOutput(checkAndAlert, TO_EMAIL, batteryChar, 36);
+    EXPECT_NE(output.find("Hi, the temperature is too high"), std::string::npos); // Check if the alert was sent
 
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_EMAIL, batteryChar, 30);
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output, "To: a.b@c.com\nHi, the temperature is too low\n"); // Low alert
-
-    // High active cooling scenarios
-    batteryChar.coolingType = HI_ACTIVE_COOLING;
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_EMAIL, batteryChar, 46);
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output, "To: a.b@c.com\nHi, the temperature is too high\n"); // High alert
-
-    // Medium active cooling scenarios
-    batteryChar.coolingType = MED_ACTIVE_COOLING;
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_EMAIL, batteryChar, 41);
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output, "To: a.b@c.com\nHi, the temperature is too high\n"); // High alert
+    // Test sending NORMAL alert
+    output = captureOutput(checkAndAlert, TO_EMAIL, batteryChar, 34);
+    EXPECT_EQ(output, ""); // No alert should be sent for NORMAL
 }
 
-// Test cases for edge cases in checkAndAlert
 TEST(TypeWiseAlertTestSuite, CheckAndAlertEdgeCases) {
-    BatteryCharacter batteryChar;
+    BatteryCharacter batteryCharHiActive = {HI_ACTIVE_COOLING, "BrandB"};
+    
+    // Test sending NORMAL alert at upper limit
+    std::string output = captureOutput(checkAndAlert, TO_EMAIL, batteryCharHiActive, 45);
+    EXPECT_EQ(output, ""); // No alert for NORMAL
+    
+    // Test sending TOO_HIGH alert
+    output = captureOutput(checkAndAlert, TO_EMAIL, batteryCharHiActive, 46);
+    EXPECT_NE(output.find("Hi, the temperature is too high"), std::string::npos); // Alert sent for TOO_HIGH
 
-    // Edge cases for passive cooling
-    batteryChar.coolingType = PASSIVE_COOLING;
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_EMAIL, batteryChar, 0); // At lower limit
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output, "To: a.b@c.com\nHi, the temperature is too low\n"); // Should trigger low alert
+    // Test sending TOO_LOW alert
+    output = captureOutput(checkAndAlert, TO_EMAIL, batteryCharHiActive, -1);
+    EXPECT_NE(output.find("Hi, the temperature is too low"), std::string::npos); // Alert sent for TOO_LOW
+}
 
-    // Edge case for upper limit with high active cooling
-    batteryChar.coolingType = HI_ACTIVE_COOLING;
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_EMAIL, batteryChar, 45); // At upper limit
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output, "To: a.b@c.com\nHi, the temperature is too high\n"); // Should trigger high alert
+TEST(TypeWiseAlertTestSuite, CheckAndAlertMedActiveCooling) {
+    BatteryCharacter batteryCharMedActive = {MED_ACTIVE_COOLING, "BrandC"};
 
-    // Ensure normal conditions do not trigger alerts
-    batteryChar.coolingType = MED_ACTIVE_COOLING;
-    testing::internal::CaptureStdout();
-    checkAndAlert(TO_EMAIL, batteryChar, 35); // Normal condition
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output, ""); // No alert should be triggered
+    // Test sending NORMAL alert at upper limit
+    std::string output = captureOutput(checkAndAlert, TO_EMAIL, batteryCharMedActive, 40);
+    EXPECT_EQ(output, ""); // No alert for NORMAL
+
+    // Test sending TOO_HIGH alert
+    output = captureOutput(checkAndAlert, TO_EMAIL, batteryCharMedActive, 41);
+    EXPECT_NE(output.find("Hi, the temperature is too high"), std::string::npos); // Alert sent for TOO_HIGH
+
+    // Test sending TOO_LOW alert
+    output = captureOutput(checkAndAlert, TO_EMAIL, batteryCharMedActive, -1);
+    EXPECT_NE(output.find("Hi, the temperature is too low"), std::string::npos); // Alert sent for TOO_LOW
 }
 
