@@ -1,7 +1,5 @@
 #pragma once
 
-#include <utility> // Include for std::pair
-
 typedef enum {
   PASSIVE_COOLING,
   HI_ACTIVE_COOLING,
@@ -16,12 +14,9 @@ typedef enum {
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-
-// Forward declaration of the getBreachMessage function
-const char* getBreachMessage(BreachType breachType);
-
-// Forward declaration of the getCoolingLimits function
-std::pair<int, int> getCoolingLimits(CoolingType coolingType);
+void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
+void sendToController(BreachType breachType);
+void sendToEmail(BreachType breachType);
 
 typedef enum {
   TO_CONTROLLER,
@@ -33,9 +28,5 @@ typedef struct {
   char brand[48];
 } BatteryCharacter;
 
-void checkAndAlert(
-  AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
-
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+void getCoolingLimits(CoolingType coolingType, int* lowerLimit, int* upperLimit);
 
