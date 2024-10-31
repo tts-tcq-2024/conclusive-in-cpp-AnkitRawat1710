@@ -23,40 +23,32 @@ TEST(TypeWiseAlertTestSuite, ClassifiesTemperatureBreach) {
     EXPECT_EQ(classifyTemperatureBreach(MED_ACTIVE_COOLING, 45), TOO_HIGH);
 }
 
-// Test for check and alert functionality (mocking stdout)
+// Helper function to check output messages for sending alerts
+void checkEmailOutput(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC, const std::string& expectedMessage) {
+    testing::internal::CaptureStdout(); // Start capturing stdout
+    checkAndAlert(alertTarget, batteryChar, temperatureInC); // Trigger alert
+    std::string output = testing::internal::GetCapturedStdout(); // Get captured output
+    EXPECT_NE(output.find(expectedMessage), std::string::npos); // Check for expected message
+}
+
+// Test for check and alert functionality
 TEST(TypeWiseAlertTestSuite, CheckAndAlertFunctionality) {
     BatteryCharacter batteryChar = {PASSIVE_COOLING, "Battery A"};
-    testing::internal::CaptureStdout(); // Start capturing stdout
-
-    checkAndAlert(TO_EMAIL, batteryChar, -1); // Expect "too low" alert
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Hi, the temperature is too low"), std::string::npos);
-
-    checkAndAlert(TO_EMAIL, batteryChar, 36); // Expect "too high" alert
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Hi, the temperature is too high"), std::string::npos);
-
-    checkAndAlert(TO_EMAIL, batteryChar, 30); // Expect no alert
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output.find("Hi, the temperature is too low"), std::string::npos);
+    
+    checkEmailOutput(TO_EMAIL, batteryChar, -1, "Hi, the temperature is too low"); // Expect "too low" alert
+    checkEmailOutput(TO_EMAIL, batteryChar, 36, "Hi, the temperature is too high"); // Expect "too high" alert
+    checkEmailOutput(TO_EMAIL, batteryChar, 30, ""); // Expect no alert
 }
 
 // Edge case tests
 TEST(TypeWiseAlertTestSuite, CheckAndAlertEdgeCases) {
     BatteryCharacter batteryChar = {HI_ACTIVE_COOLING, "Battery B"};
-    testing::internal::CaptureStdout(); // Start capturing stdout
-
-    checkAndAlert(TO_EMAIL, batteryChar, -1); // Expect "too low" alert
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Hi, the temperature is too low"), std::string::npos);
-
-    checkAndAlert(TO_EMAIL, batteryChar, 46); // Expect "too high" alert
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Hi, the temperature is too high"), std::string::npos);
-
-    checkAndAlert(TO_EMAIL, batteryChar, 0); // Expect no alert
-    output = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(output.find("Hi, the temperature is too low"), std::string::npos);
+    
+    checkEmailOutput(TO_EMAIL, batteryChar, -1, "Hi, the temperature is too low"); // Expect "too low" alert
+    checkEmailOutput(TO_EMAIL, batteryChar, 46, "Hi, the temperature is too high"); // Expect "too high" alert
+    checkEmailOutput(TO_EMAIL, batteryChar, 0, ""); // Expect no alert
 }
+
+
 
 
