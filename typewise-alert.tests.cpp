@@ -96,3 +96,4 @@ TEST(TypeWiseAlertTestSuite, CheckAndAlertEdgeCases) {
     output = testing::internal::GetCapturedStdout();
     EXPECT_EQ(output, ""); // No alert should be triggered
 }
+
