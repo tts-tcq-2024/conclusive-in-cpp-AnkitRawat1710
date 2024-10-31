@@ -8,6 +8,9 @@
 enum CoolingType {
     AIR_COOLING,
     WATER_COOLING,
+    PASSIVE_COOLING,
+    HI_ACTIVE_COOLING,
+    MED_ACTIVE_COOLING,
     NONE
 };
 
@@ -15,7 +18,10 @@ enum CoolingType {
 enum BreachType {
     NO_BREACH,
     LOW_BREACH,
-    HIGH_BREACH
+    HIGH_BREACH,
+    TOO_LOW,
+    TOO_HIGH,
+    NORMAL
 };
 
 // Define AlertTarget enumeration
