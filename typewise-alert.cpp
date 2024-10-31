@@ -23,6 +23,7 @@ public:
   }
 };
 
+
 class MedActiveCooling : public ICoolingStrategy {
 public:
   BreachType classifyTemperature(double temperature) const override {
