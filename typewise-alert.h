@@ -1,32 +1,24 @@
-#pragma once
+#ifndef TYPEWISE_ALERT_H
+#define TYPEWISE_ALERT_H
 
-typedef enum {
-  PASSIVE_COOLING,
-  HI_ACTIVE_COOLING,
-  MED_ACTIVE_COOLING
-} CoolingType;
+// Include necessary standard libraries
+#include <iostream>
+#include <string>
 
-typedef enum {
-  NORMAL,
-  TOO_LOW,
-  TOO_HIGH
-} BreachType;
+// Forward declarations or includes for AlertTarget and BatteryCharacter
+enum AlertTarget {
+    TO_EMAIL,
+    TO_CONSOLE
+};
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+struct BatteryCharacter {
+    CoolingType coolingType; // Assuming CoolingType is defined elsewhere
+    std::string batteryId;   // Assuming batteryId is of type string
+};
+
+// Function declarations
 void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+// Other function declarations...
 
-typedef enum {
-  TO_CONTROLLER,
-  TO_EMAIL
-} AlertTarget;
-
-typedef struct {
-  CoolingType coolingType;
-  char brand[48];
-} BatteryCharacter;
-
-void getCoolingLimits(CoolingType coolingType, int* lowerLimit, int* upperLimit);
-
+#endif // TYPEWISE_ALERT_H
