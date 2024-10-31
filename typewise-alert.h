@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility> // Include for std::pair
+
 typedef enum {
   PASSIVE_COOLING,
   HI_ACTIVE_COOLING,
@@ -18,6 +20,9 @@ BreachType classifyTemperatureBreach(CoolingType coolingType, double temperature
 // Forward declaration of the getBreachMessage function
 const char* getBreachMessage(BreachType breachType);
 
+// Forward declaration of the getCoolingLimits function
+std::pair<int, int> getCoolingLimits(CoolingType coolingType);
+
 typedef enum {
   TO_CONTROLLER,
   TO_EMAIL
@@ -33,3 +38,4 @@ void checkAndAlert(
 
 void sendToController(BreachType breachType);
 void sendToEmail(BreachType breachType);
+
