@@ -1,5 +1,6 @@
 #include "typewise-alert.h"
 #include <stdio.h>
+#include <utility> // Include for std::pair
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   if (value < lowerLimit) {
@@ -11,8 +12,19 @@ BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   return NORMAL;
 }
 
+std::pair<int, int> getCoolingLimits(CoolingType coolingType) {
+  switch (coolingType) {
+    case PASSIVE_COOLING:
+      return {0, 35};
+    case HI_ACTIVE_COOLING:
+      return {0, 45};
+    case MED_ACTIVE_COOLING:
+      return {0, 40};
+  }
+  return {0, 0}; // Default case
+}
+
 BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC) {
-  // Replace with a helper function to get limits
   auto [lowerLimit, upperLimit] = getCoolingLimits(coolingType);
   return inferBreach(temperatureInC, lowerLimit, upperLimit);
 }
@@ -53,18 +65,3 @@ const char* getBreachMessage(BreachType breachType) {
   }
   return nullptr; // Return nullptr for NORMAL or if there's no breach
 }
-
-// Function to get cooling limits based on cooling type
-std::pair<int, int> getCoolingLimits(CoolingType coolingType) {
-  switch (coolingType) {
-    case PASSIVE_COOLING:
-      return {0, 35};
-    case HI_ACTIVE_COOLING:
-      return {0, 45};
-    case MED_ACTIVE_COOLING:
-      return {0, 40};
-  }
-  return {0, 0}; // Default case
-}
-
-
