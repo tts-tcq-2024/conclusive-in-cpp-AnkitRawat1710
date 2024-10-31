@@ -1,47 +1,28 @@
 #ifndef TYPEWISE_ALERT_H
 #define TYPEWISE_ALERT_H
 
-#include <iostream>
-#include <string>
-
-// Define CoolingType enumeration
-enum CoolingType {
-    AIR_COOLING,
-    WATER_COOLING,
-    PASSIVE_COOLING,
-    HI_ACTIVE_COOLING,
-    MED_ACTIVE_COOLING,
-    NONE
-};
-
-// Define BreachType enumeration
 enum BreachType {
-    NO_BREACH,
-    LOW_BREACH,
-    HIGH_BREACH,
     TOO_LOW,
     TOO_HIGH,
     NORMAL
 };
 
-// Define AlertTarget enumeration
-enum AlertTarget {
-    TO_EMAIL,
-    TO_CONTROLLER,
-    TO_CONSOLE
+enum CoolingType {
+    PASSIVE_COOLING,
+    HI_ACTIVE_COOLING,
+    MED_ACTIVE_COOLING
 };
 
-// Define BatteryCharacter struct
 struct BatteryCharacter {
-    CoolingType coolingType; 
-    std::string batteryId;
+    CoolingType coolingType; // Assuming CoolingType is defined elsewhere
 };
 
 // Function declarations
-void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 void getCoolingLimits(CoolingType coolingType, int* lowerLimit, int* upperLimit);
+void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
 void sendToController(BreachType breachType);
 void sendToEmail(BreachType breachType);
 
 #endif // TYPEWISE_ALERT_H
+
