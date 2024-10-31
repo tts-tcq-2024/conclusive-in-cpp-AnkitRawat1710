@@ -1,32 +1,40 @@
 #pragma once
 
-typedef enum {
+#include <string>
+
+enum CoolingType {
   PASSIVE_COOLING,
   HI_ACTIVE_COOLING,
   MED_ACTIVE_COOLING
-} CoolingType;
+};
 
-typedef enum {
+enum BreachType {
   NORMAL,
   TOO_LOW,
   TOO_HIGH
-} BreachType;
+};
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-
-typedef enum {
+enum AlertTarget {
   TO_CONTROLLER,
   TO_EMAIL
-} AlertTarget;
+};
 
-typedef struct {
+struct BatteryCharacter {
   CoolingType coolingType;
-  char brand[48];
-} BatteryCharacter;
+  std::string brand;
+};
 
-void checkAndAlert(
-  AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
+class ICoolingStrategy {
+public:
+  virtual ~ICoolingStrategy() = default;
+  virtual BreachType classifyTemperature(double temperature) const = 0;
+};
 
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+class IAlertStrategy {
+public:
+  virtual ~IAlertStrategy() = default;
+  virtual void sendAlert(BreachType breachType) const = 0;
+};
+
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
