@@ -1,28 +1,29 @@
 #ifndef TYPEWISE_ALERT_H
 #define TYPEWISE_ALERT_H
 
-enum BreachType {
+// Breach types enumeration
+typedef enum {
     TOO_LOW,
     TOO_HIGH,
     NORMAL
-};
+} BreachType;
 
-enum CoolingType {
+// Cooling types enumeration
+typedef enum {
     PASSIVE_COOLING,
     HI_ACTIVE_COOLING,
     MED_ACTIVE_COOLING
-};
+} CoolingType;
 
-struct BatteryCharacter {
-    CoolingType coolingType; // Assuming CoolingType is defined elsewhere
-};
+// Battery character structure
+typedef struct {
+    CoolingType coolingType;
+} BatteryCharacter;
 
 // Function declarations
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 void getCoolingLimits(CoolingType coolingType, int* lowerLimit, int* upperLimit);
-void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+void checkAndAlert(BatteryCharacter batteryChar, double temperatureInC);
+void sendAlert(BreachType breachType);
 
 #endif // TYPEWISE_ALERT_H
-
