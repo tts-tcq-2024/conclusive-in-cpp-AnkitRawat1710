@@ -1,5 +1,6 @@
 #include "typewise-alert.h"
 #include <iostream>
+#include <memory> // Include memory for std::unique_ptr
 
 // Implement different breach classifiers
 class PassiveCoolingBreachClassifier : public IBreachClassifier {
@@ -46,7 +47,7 @@ public:
   }
 };
 
-// Helper function to map CoolingType to corresponding IBreachClassifier
+// Factory function to create breach classifiers
 std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingType) {
   switch(coolingType) {
     case CoolingType::PASSIVE_COOLING: return std::make_unique<PassiveCoolingBreachClassifier>();
@@ -56,7 +57,7 @@ std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingTyp
   }
 }
 
-// Helper function to map AlertTarget to corresponding IAlert
+// Factory function to create alert types
 std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget) {
   switch(alertTarget) {
     case AlertTarget::TO_CONTROLLER: return std::make_unique<ControllerAlert>();
@@ -82,3 +83,4 @@ void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar,
   BreachType breachType = breachClassifier->classify(temperatureInC);
   alert->send(breachType);
 }
+
