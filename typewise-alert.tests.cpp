@@ -1,5 +1,6 @@
 #include "typewise-alert.h"
 #include <cassert>
+#include <iostream>  // Include this to use std::cout
 
 void testCheckAndAlert() {
     BatteryCharacter batteryChar = {PASSIVE_COOLING};
