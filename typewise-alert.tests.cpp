@@ -1,43 +1,31 @@
-#include <assert.h>
+#include <gtest/gtest.h>
 #include "typewise-alert.h"
 
-// Test cases for inferBreach
-void test_inferBreach() {
-    assert(inferBreach(0, 1, 10) == TOO_LOW);
-    assert(inferBreach(5, 1, 10) == NORMAL);
-    assert(inferBreach(15, 1, 10) == TOO_HIGH);
-    assert(inferBreach(-5, 1, 10) == TOO_LOW); // Edge case: negative temperature
-    assert(inferBreach(11, 10, 10) == TOO_HIGH); // Boundary case
+TEST(TypeWiseAlertTestSuite, InfersBreachAccordingToLimits) {
+  EXPECT_EQ(inferBreach(-5, 0, 35), BreachType::TOO_LOW);
+  EXPECT_EQ(inferBreach(50, 0, 45), BreachType::TOO_HIGH);
+  EXPECT_EQ(inferBreach(30, 0, 40), BreachType::NORMAL);
 }
 
-// Test cases for getCoolingLimits
-void test_getCoolingLimits() {
-    int lowerLimit, upperLimit;
-
-    getCoolingLimits(PASSIVE_COOLING, &lowerLimit, &upperLimit);
-    assert(lowerLimit == 0 && upperLimit == 35); // Example limits for passive cooling
-
-    getCoolingLimits(HI_ACTIVE_COOLING, &lowerLimit, &upperLimit);
-    assert(lowerLimit == 0 && upperLimit == 45); // Example limits for high active cooling
-
-    // Add more cases for each cooling type
+TEST(TypeWiseAlertTestSuite, ClassifiesTemperatureBreach) {
+  EXPECT_EQ(classifyTemperatureBreach(CoolingType::PASSIVE_COOLING, 36), BreachType::TOO_HIGH);
+  EXPECT_EQ(classifyTemperatureBreach(CoolingType::HI_ACTIVE_COOLING, 46), BreachType::TOO_HIGH);
+  EXPECT_EQ(classifyTemperatureBreach(CoolingType::MED_ACTIVE_COOLING, 39), BreachType::NORMAL);
 }
 
-// Test cases for checkAndAlert
-void test_checkAndAlert() {
-    BatteryCharacter batteryChar;
-    batteryChar.coolingType = PASSIVE_COOLING;
-
-    // Expecting alert to be sent to controller
-    checkAndAlert(TO_CONTROLLER, batteryChar, 40); // Expect breach
-    // Further assertions can be made to check the behavior after calling checkAndAlert
+TEST(TypeWiseAlertTestSuite, SendsControllerAlert) {
+  ControllerAlertHandler controllerAlert;
+  testing::internal::CaptureStdout();
+  controllerAlert.sendAlert(BreachType::TOO_HIGH);
+  std::string output = testing::internal::GetCapturedStdout();
+  EXPECT_FALSE(output.empty());
 }
 
-int main() {
-    test_inferBreach();
-    test_getCoolingLimits();
-    test_checkAndAlert();
-    // Add more tests as necessary
-    return 0;
+TEST(TypeWiseAlertTestSuite, SendsEmailAlert) {
+  EmailAlertHandler emailAlert;
+  testing::internal::CaptureStdout();
+  emailAlert.sendAlert(BreachType::TOO_LOW);
+  std::string output = testing::internal::GetCapturedStdout();
+  EXPECT_FALSE(output.empty());
 }
 
