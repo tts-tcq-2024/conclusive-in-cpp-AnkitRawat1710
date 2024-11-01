@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 enum class CoolingType {
@@ -37,6 +38,14 @@ public:
   virtual ~IAlert() = default;
   virtual void send(BreachType breachType) const = 0;
 };
+
+// Factory functions for creating classifiers and alerts
+std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingType);
+std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget);
+
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
+
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
