@@ -1,33 +1,42 @@
-#ifndef TYPEWISE_ALERT_H
-#define TYPEWISE_ALERT_H
+#pragma once
+#include <string>
 
-#include <memory>
-
-enum AlertTarget { TO_CONTROLLER, TO_EMAIL };
-enum CoolingType { PASSIVE_COOLING, HI_ACTIVE_COOLING, MED_ACTIVE_COOLING };
-enum BreachType { NORMAL, TOO_LOW, TOO_HIGH };
+enum class CoolingType { PASSIVE_COOLING, HI_ACTIVE_COOLING, MED_ACTIVE_COOLING };
+enum class BreachType { NORMAL, TOO_LOW, TOO_HIGH };
+enum class AlertTarget { TO_CONTROLLER, TO_EMAIL };
 
 struct BatteryCharacter {
     CoolingType coolingType;
+    std::string brand;
 };
 
+// Abstract base class for alert mechanism
 class AlertHandler {
 public:
-    virtual void sendAlert(BreachType breachType) const = 0;
+    virtual void sendAlert(BreachType breachType) = 0;
     virtual ~AlertHandler() = default;
 };
 
-class ControllerAlertHandler : public AlertHandler {
+// Controller alert implementation
+class ControllerAlert : public AlertHandler {
 public:
-    void sendAlert(BreachType breachType) const override;
+    void sendAlert(BreachType breachType) override;
 };
 
-class EmailAlertHandler : public AlertHandler {
+// Email alert implementation
+class EmailAlert : public AlertHandler {
 public:
-    void sendAlert(BreachType breachType) const override;
+    void sendAlert(BreachType breachType) override;
 };
 
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
+// Cooling limit handler class
+class CoolingLimitHandler {
+public:
+    static BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+private:
+    static BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+};
 
-#endif // TYPEWISE_ALERT_H
+// Main function to check and alert
+void checkAndAlert(AlertHandler* alertHandler, BatteryCharacter batteryChar, double temperatureInC);
+
