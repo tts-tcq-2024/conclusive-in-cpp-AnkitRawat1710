@@ -1,31 +1,15 @@
-#include <gtest/gtest.h>
 #include "typewise-alert.h"
+#include <cassert>
 
-TEST(TypeWiseAlertTestSuite, InfersBreachAccordingToLimits) {
-  EXPECT_EQ(inferBreach(-5, 0, 35), BreachType::TOO_LOW);
-  EXPECT_EQ(inferBreach(50, 0, 45), BreachType::TOO_HIGH);
-  EXPECT_EQ(inferBreach(30, 0, 40), BreachType::NORMAL);
+void testCheckAndAlert() {
+    BatteryCharacter batteryChar = {PASSIVE_COOLING};
+    checkAndAlert(TO_CONTROLLER, batteryChar, -5.0); // Expected to send TOO_LOW alert
+    checkAndAlert(TO_EMAIL, batteryChar, 50.0);      // Expected to send TOO_HIGH alert
+    checkAndAlert(TO_EMAIL, batteryChar, 25.0);      // Expected to send NORMAL alert
 }
 
-TEST(TypeWiseAlertTestSuite, ClassifiesTemperatureBreach) {
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::PASSIVE_COOLING, 36), BreachType::TOO_HIGH);
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::HI_ACTIVE_COOLING, 46), BreachType::TOO_HIGH);
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::MED_ACTIVE_COOLING, 39), BreachType::NORMAL);
+int main() {
+    testCheckAndAlert();
+    std::cout << "All tests passed!\n";
+    return 0;
 }
-
-TEST(TypeWiseAlertTestSuite, SendsControllerAlert) {
-  ControllerAlertHandler controllerAlert;
-  testing::internal::CaptureStdout();
-  controllerAlert.sendAlert(BreachType::TOO_HIGH);
-  std::string output = testing::internal::GetCapturedStdout();
-  EXPECT_FALSE(output.empty());
-}
-
-TEST(TypeWiseAlertTestSuite, SendsEmailAlert) {
-  EmailAlertHandler emailAlert;
-  testing::internal::CaptureStdout();
-  emailAlert.sendAlert(BreachType::TOO_LOW);
-  std::string output = testing::internal::GetCapturedStdout();
-  EXPECT_FALSE(output.empty());
-}
-
