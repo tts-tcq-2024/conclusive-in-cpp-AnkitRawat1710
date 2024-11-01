@@ -1,3 +1,4 @@
+// typewise-alert.h
 #pragma once
 #include <string>
 
@@ -6,37 +7,10 @@ enum class BreachType { NORMAL, TOO_LOW, TOO_HIGH };
 enum class AlertTarget { TO_CONTROLLER, TO_EMAIL };
 
 struct BatteryCharacter {
-    CoolingType coolingType;
-    std::string brand;
+  CoolingType coolingType;
+  std::string brand;
 };
 
-// Abstract base class for alert mechanism
-class AlertHandler {
-public:
-    virtual void sendAlert(BreachType breachType) = 0;
-    virtual ~AlertHandler() = default;
-};
-
-// Controller alert implementation
-class ControllerAlert : public AlertHandler {
-public:
-    void sendAlert(BreachType breachType) override;
-};
-
-// Email alert implementation
-class EmailAlert : public AlertHandler {
-public:
-    void sendAlert(BreachType breachType) override;
-};
-
-// Cooling limit handler class
-class CoolingLimitHandler {
-public:
-    static BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-private:
-    static BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-};
-
-// Main function to check and alert
-void checkAndAlert(AlertHandler* alertHandler, BatteryCharacter batteryChar, double temperatureInC);
-
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
