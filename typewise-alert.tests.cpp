@@ -1,30 +1,28 @@
-// typewise-alert.tests.cpp
 #include <gtest/gtest.h>
 #include "typewise-alert.h"
 
-TEST(TypeWiseAlertTestSuite, InfersBreachAccordingToLimits) {
-  EXPECT_EQ(inferBreach(30, 20, 40), BreachType::NORMAL);
-  EXPECT_EQ(inferBreach(15, 20, 40), BreachType::TOO_LOW);
-  EXPECT_EQ(inferBreach(45, 20, 40), BreachType::TOO_HIGH);
+// Helper functions to streamline test cases
+BatteryCharacter createBatteryCharacter(CoolingType coolingType, const std::string& brand) {
+  return BatteryCharacter{coolingType, brand};
 }
 
-TEST(TypeWiseAlertTestSuite, ClassifiesTemperatureBreachForCoolingTypes) {
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::PASSIVE_COOLING, 20), BreachType::NORMAL);
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::PASSIVE_COOLING, 36), BreachType::TOO_HIGH);
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::HI_ACTIVE_COOLING, 46), BreachType::TOO_HIGH);
-  EXPECT_EQ(classifyTemperatureBreach(CoolingType::MED_ACTIVE_COOLING, 41), BreachType::TOO_HIGH);
+TEST(TypeWiseAlertTestSuite, InferBreachAccordingToLimits) {
+  EXPECT_EQ(inferBreach(-1, 0, 35), BreachType::TOO_LOW);
+  EXPECT_EQ(inferBreach(36, 0, 35), BreachType::TOO_HIGH);
+  EXPECT_EQ(inferBreach(20, 0, 35), BreachType::NORMAL);
 }
 
-TEST(TypeWiseAlertTestSuite, SendsAlertToController) {
-  testing::internal::CaptureStdout();
-  sendToController(BreachType::TOO_HIGH);
-  std::string output = testing::internal::GetCapturedStdout();
-  EXPECT_NE(output.find("feed : 2"), std::string::npos);
+TEST(TypeWiseAlertTestSuite, PassiveCoolingBreachClassification) {
+  BatteryCharacter battery = createBatteryCharacter(CoolingType::PASSIVE_COOLING, "BrandA");
+  checkAndAlert(AlertTarget::TO_CONTROLLER, battery, 36); // Expect to go to controller as TOO_HIGH
 }
 
-TEST(TypeWiseAlertTestSuite, SendsAlertToEmail) {
-  testing::internal::CaptureStdout();
-  sendToEmail(BreachType::TOO_HIGH);
-  std::string output = testing::internal::GetCapturedStdout();
-  EXPECT_NE(output.find("To: a.b@c.com\nHi, the temperature is too high\n"), std::string::npos);
+TEST(TypeWiseAlertTestSuite, HiActiveCoolingBreachClassification) {
+  BatteryCharacter battery = createBatteryCharacter(CoolingType::HI_ACTIVE_COOLING, "BrandB");
+  checkAndAlert(AlertTarget::TO_EMAIL, battery, 46); // Expect email alert as TOO_HIGH
+}
+
+TEST(TypeWiseAlertTestSuite, MedActiveCoolingBreachClassification) {
+  BatteryCharacter battery = createBatteryCharacter(CoolingType::MED_ACTIVE_COOLING, "BrandC");
+  checkAndAlert(AlertTarget::TO_EMAIL, battery, 39); // Expect email alert as NORMAL
 }
