@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <stdexcept>
+#include <functional> // Added to enable std::function
 
 // Breach Classification Implementation
 BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
