@@ -1,21 +1,20 @@
 #pragma once
-
 #include <memory>
 #include <string>
 
-enum class CoolingType {
+enum CoolingType {
   PASSIVE_COOLING,
   HI_ACTIVE_COOLING,
   MED_ACTIVE_COOLING
 };
 
-enum class BreachType {
+enum BreachType {
   NORMAL,
   TOO_LOW,
   TOO_HIGH
 };
 
-enum class AlertTarget {
+enum AlertTarget {
   TO_CONTROLLER,
   TO_EMAIL
 };
@@ -25,27 +24,27 @@ struct BatteryCharacter {
   std::string brand;
 };
 
-// Abstract base class for Breach Classification Strategy
+// Interface for Breach Classification Strategy
 class IBreachClassifier {
 public:
   virtual ~IBreachClassifier() = default;
   virtual BreachType classify(double temperatureInC) const = 0;
 };
 
-// Abstract base class for Alert Strategy
+// Interface for Alert Strategy
 class IAlert {
 public:
   virtual ~IAlert() = default;
   virtual void send(BreachType breachType) const = 0;
 };
 
-// Factory functions for creating classifiers and alerts
+// Factory function declarations
 std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingType);
 std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget);
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+// Core function
 void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
 
-
+// Utility function
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
+
