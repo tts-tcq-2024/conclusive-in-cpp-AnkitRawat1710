@@ -16,17 +16,15 @@ TEST(TypeWiseAlertTestSuite, ClassifiesTemperatureBreachForCoolingTypes) {
 }
 
 TEST(TypeWiseAlertTestSuite, SendsAlertToController) {
-  ControllerAlert controllerAlert;
   testing::internal::CaptureStdout();
-  controllerAlert.sendAlert(BreachType::TOO_HIGH);
+  sendToController(BreachType::TOO_HIGH);
   std::string output = testing::internal::GetCapturedStdout();
   EXPECT_NE(output.find("feed : 2"), std::string::npos);
 }
 
 TEST(TypeWiseAlertTestSuite, SendsAlertToEmail) {
-  EmailAlert emailAlert;
   testing::internal::CaptureStdout();
-  emailAlert.sendAlert(BreachType::TOO_HIGH);
+  sendToEmail(BreachType::TOO_HIGH);
   std::string output = testing::internal::GetCapturedStdout();
   EXPECT_NE(output.find("To: a.b@c.com\nHi, the temperature is too high\n"), std::string::npos);
 }
