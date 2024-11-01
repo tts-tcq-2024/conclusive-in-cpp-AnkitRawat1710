@@ -1,8 +1,10 @@
 #include "typewise-alert.h"
 #include <stdio.h>
-#include <memory>  // Include this for std::unique_ptr and std::make_unique
+#include <memory>     // For std::unique_ptr and std::make_unique
+#include <iostream>   // For std::cout, std::hex, and std::endl
 #include <unordered_map>
 
+// Your existing code continues here...
 
 // Define temperature limits per cooling type
 struct TemperatureLimits {
