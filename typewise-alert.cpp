@@ -1,61 +1,84 @@
-// typewise-alert.cpp
 #include "typewise-alert.h"
 #include <iostream>
 
-struct CoolingLimits {
-  int lowerLimit;
-  int upperLimit;
+// Implement different breach classifiers
+class PassiveCoolingBreachClassifier : public IBreachClassifier {
+public:
+  BreachType classify(double temperatureInC) const override {
+    return inferBreach(temperatureInC, 0, 35);
+  }
 };
 
-CoolingLimits getCoolingLimits(CoolingType coolingType) {
-  switch (coolingType) {
-    case CoolingType::PASSIVE_COOLING: return {0, 35};
-    case CoolingType::HI_ACTIVE_COOLING: return {0, 45};
-    case CoolingType::MED_ACTIVE_COOLING: return {0, 40};
+class HiActiveCoolingBreachClassifier : public IBreachClassifier {
+public:
+  BreachType classify(double temperatureInC) const override {
+    return inferBreach(temperatureInC, 0, 45);
   }
-  return {0, 0}; // Default case to prevent warning
+};
+
+class MedActiveCoolingBreachClassifier : public IBreachClassifier {
+public:
+  BreachType classify(double temperatureInC) const override {
+    return inferBreach(temperatureInC, 0, 40);
+  }
+};
+
+// Implement different alert mechanisms
+class ControllerAlert : public IAlert {
+public:
+  void send(BreachType breachType) const override {
+    const unsigned short header = 0xfeed;
+    std::cout << std::hex << header << " : " << static_cast<int>(breachType) << "\n";
+  }
+};
+
+class EmailAlert : public IAlert {
+public:
+  void send(BreachType breachType) const override {
+    const std::string recipient = "a.b@c.com";
+    if (breachType == BreachType::TOO_LOW) {
+      std::cout << "To: " << recipient << "\n";
+      std::cout << "Hi, the temperature is too low\n";
+    } else if (breachType == BreachType::TOO_HIGH) {
+      std::cout << "To: " << recipient << "\n";
+      std::cout << "Hi, the temperature is too high\n";
+    }
+  }
+};
+
+// Helper function to map CoolingType to corresponding IBreachClassifier
+std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingType) {
+  switch(coolingType) {
+    case CoolingType::PASSIVE_COOLING: return std::make_unique<PassiveCoolingBreachClassifier>();
+    case CoolingType::HI_ACTIVE_COOLING: return std::make_unique<HiActiveCoolingBreachClassifier>();
+    case CoolingType::MED_ACTIVE_COOLING: return std::make_unique<MedActiveCoolingBreachClassifier>();
+    default: throw std::invalid_argument("Unknown CoolingType");
+  }
+}
+
+// Helper function to map AlertTarget to corresponding IAlert
+std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget) {
+  switch(alertTarget) {
+    case AlertTarget::TO_CONTROLLER: return std::make_unique<ControllerAlert>();
+    case AlertTarget::TO_EMAIL: return std::make_unique<EmailAlert>();
+    default: throw std::invalid_argument("Unknown AlertTarget");
+  }
 }
 
 BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
-  if (value < lowerLimit) return BreachType::TOO_LOW;
-  if (value > upperLimit) return BreachType::TOO_HIGH;
+  if (value < lowerLimit) {
+    return BreachType::TOO_LOW;
+  }
+  if (value > upperLimit) {
+    return BreachType::TOO_HIGH;
+  }
   return BreachType::NORMAL;
 }
 
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC) {
-  CoolingLimits limits = getCoolingLimits(coolingType);
-  return inferBreach(temperatureInC, limits.lowerLimit, limits.upperLimit);
-}
-
-void sendToController(BreachType breachType) {
-  const unsigned short header = 0xfeed;
-  std::cout << std::hex << header << " : " << static_cast<int>(breachType) << std::endl;
-}
-
-void sendToEmail(BreachType breachType) {
-  const std::string recipient = "a.b@c.com";
-  if (breachType == BreachType::TOO_LOW) {
-    std::cout << "To: " << recipient << "\nHi, the temperature is too low\n";
-  } else if (breachType == BreachType::TOO_HIGH) {
-    std::cout << "To: " << recipient << "\nHi, the temperature is too high\n";
-  }
-}
-
-using AlertFunction = void(*)(BreachType);
-
 void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC) {
-  BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
-  
-  // Select alert function based on target
-  AlertFunction alertFunction = nullptr;
-  if (alertTarget == AlertTarget::TO_CONTROLLER) {
-    alertFunction = sendToController;
-  } else if (alertTarget == AlertTarget::TO_EMAIL) {
-    alertFunction = sendToEmail;
-  }
-  
-  // Dispatch alert
-  if (alertFunction) {
-    alertFunction(breachType);
-  }
+  auto breachClassifier = createBreachClassifier(batteryChar.coolingType);
+  auto alert = createAlert(alertTarget);
+
+  BreachType breachType = breachClassifier->classify(temperatureInC);
+  alert->send(breachType);
 }
