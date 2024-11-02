@@ -46,17 +46,6 @@ You have seen a few workflows in this repository. They are quality-gates to prev
 
 During the next four weeks, what improvement do you plan in your code-quality practice? (in your regular work, not in this repository!)
 
-### During the next four weeks, I plan to enhance my code-quality practices by focusing on the following areas:
+### Not just next 4 weeks, I will try make it a habit that I take care of Modularity, Implementation Pure Functions, Effective Testing, Test-Driven Development and Code Reviews in my code development.
 
-- Modularity: I will aim to structure my code into smaller, self-contained modules, making it easier to maintain and extend.
-
-- Bug Detection with Testing: I will prioritize bug detection through rigorous testing, ensuring that all potential edge cases are covered.
-
-- Test-Driven Development (TDD): Adopting TDD will be a key practice for me, as it promotes writing tests before code, leading to higher reliability and better design.
-
-- Effective Testing: I will work on improving the effectiveness of my testing strategies, ensuring that tests are meaningful and cover a wide range of scenarios.
-
-- Code Reviews for All Code: Implementing a process for code reviews for every piece of code written will help catch issues early and encourage best practices.
-
-- Implementing Pure Functions: I will focus on writing pure functions, as they enhance testability and make the code easier to understand and reason about.m
 **
