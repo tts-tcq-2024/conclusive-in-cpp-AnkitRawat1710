@@ -46,17 +46,16 @@ TEST(TypeWiseAlertTestSuite, MedActiveCoolingBreachLevels) {
     checkAndAlert(TO_EMAIL, battery, 40);        // Boundary: Upper limit NORMAL
 }
 
-// Alert Mechanism Tests for Breach Types
 TEST(TypeWiseAlertTestSuite, AlertMechanismBreachTypes) {
-    ControllerAlert controllerAlert;
-    controllerAlert.send(BreachType::TOO_LOW);    // TOO_LOW to controller
-    controllerAlert.send(BreachType::TOO_HIGH);   // TOO_HIGH to controller
-    controllerAlert.send(BreachType::NORMAL);     // NORMAL to controller
+    auto controllerAlert = createAlert(AlertTarget::TO_CONTROLLER);
+    controllerAlert->send(BreachType::TOO_LOW);    // TOO_LOW to controller
+    controllerAlert->send(BreachType::TOO_HIGH);   // TOO_HIGH to controller
+    controllerAlert->send(BreachType::NORMAL);     // NORMAL to controller
 
-    EmailAlert emailAlert;
-    emailAlert.send(BreachType::TOO_LOW);         // TOO_LOW email alert
-    emailAlert.send(BreachType::TOO_HIGH);        // TOO_HIGH email alert
-    emailAlert.send(BreachType::NORMAL);          // NORMAL email alert (should not send)
+    auto emailAlert = createAlert(AlertTarget::TO_EMAIL);
+    emailAlert->send(BreachType::TOO_LOW);         // TOO_LOW email alert
+    emailAlert->send(BreachType::TOO_HIGH);        // TOO_HIGH email alert
+    emailAlert->send(BreachType::NORMAL);          // NORMAL email alert (should not send)
 }
 
 // Invalid Input Tests for Factory Functions
