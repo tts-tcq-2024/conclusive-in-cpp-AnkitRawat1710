@@ -9,7 +9,8 @@ Each test cases are structured to validate:
 4. **Invalid Input Handling**: Tests that the system handles unexpected input values by throwing exceptions where appropriate.
 
 ---
-### **Introduction**
+### **Test Cases**
+
 | **Test Case ID** | **Test Description** | **Inputs** | **Expected Output** | **Rationale** |
 |------------------|----------------------|------------|---------------------|---------------|
 | TC01 | Test `inferBreach` with value below limit | Value = -5, Limits = (0, 35) | TOO_LOW | To confirm `inferBreach` correctly identifies temperatures lower than the allowable range as TOO_LOW. |
@@ -44,6 +45,4 @@ Each test cases are structured to validate:
 ---
 ### **Conclusion**
 
-The test cases successfully validate that the `typewise-alert` module meets functional requirements across various scenarios, including breach classification, alert dispatching, and input validation. Each component of the module performed as expected, correctly handling both normal and boundary conditions. Notably, the module's response to invalid inputs was validated by tests that checked for exception handling, ensuring the module’s resilience to erroneous configurations.
-
-The results of these tests indicate that the `typewise-alert` module is well-equipped to support reliable temperature monitoring across different cooling configurations, providing timely alerts for proactive response to breaches. This test suite serves as a foundation for future enhancements and helps maintain robustness as the module evolves.
+The test cases successfully validate that the `typewise-alert` module meets functional requirements across various scenarios, including breach classification, alert dispatching, and input validation.
