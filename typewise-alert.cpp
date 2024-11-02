@@ -60,14 +60,15 @@ public:
   }
 };
 
+//Email alert implementation that sends breach notifications via email.
 class EmailAlert : public IAlert {
 public:
   void send(BreachType breachType) const override {
-    const std::string recepient = "a.b@c.com";
+    const std::string recepient = "a.b@c.com"; // Recipient email address
     if (breachType == TOO_LOW) {
-      std::cout << "To: " << recepient << "\nHi, the temperature is too low\n";
+      std::cout << "To: " << recepient << "\nHello, The temperature is too low!!\n";
     } else if (breachType == TOO_HIGH) {
-      std::cout << "To: " << recepient << "\nHi, the temperature is too high\n";
+      std::cout << "To: " << recepient << "\nHello, The temperature is too high!!\n";
     }
   }
 };
@@ -79,11 +80,11 @@ std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget) {
     { TO_EMAIL, []() { return std::make_unique<EmailAlert>(); } }
   };
   
-  auto it = alertMap.find(alertTarget);
+  auto it = alertMap.find(alertTarget); // Lookup the alert target
   if (it != alertMap.end()) {
-    return it->second();
+    return it->second(); // Return the corresponding alert instance
   }
-  throw std::invalid_argument("Unknown AlertTarget");
+  throw std::invalid_argument("Unknown AlertTarget"); // Handle invalid alert target
 }
 
 // Main checkAndAlert function
