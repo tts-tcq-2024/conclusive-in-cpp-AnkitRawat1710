@@ -41,7 +41,7 @@ Each test cases are structured to validate:
 | TC27 | Test Invalid CoolingType for Breach Classifier Factory | Invalid CoolingType (-1) | Throws std::invalid_argument exception | To confirm the breach classifier factory correctly throws an exception on an invalid CoolingType. |
 | TC28 | Test Invalid AlertTarget for Alert Factory | Invalid AlertTarget (-1) | Throws std::invalid_argument exception | To verify the alert factory throws an exception on invalid AlertTarget input. |
 
-
+---
 ### **Conclusion**
 
 The test cases successfully validate that the `typewise-alert` module meets functional requirements across various scenarios, including breach classification, alert dispatching, and input validation. Each component of the module performed as expected, correctly handling both normal and boundary conditions. Notably, the module's response to invalid inputs was validated by tests that checked for exception handling, ensuring the module’s resilience to erroneous configurations.
