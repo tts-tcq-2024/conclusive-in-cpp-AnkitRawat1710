@@ -1,4 +1,3 @@
-Certainly! Here’s the rationale for each test case, providing the reasoning behind its inclusion:
 
 | **Test Case ID** | **Test Description** | **Inputs** | **Expected Output** | **Rationale** |
 |------------------|----------------------|------------|---------------------|---------------|
@@ -31,4 +30,3 @@ Certainly! Here’s the rationale for each test case, providing the reasoning be
 | TC27 | Test Invalid CoolingType for Breach Classifier Factory | Invalid CoolingType (-1) | Throws std::invalid_argument exception | To confirm the breach classifier factory correctly throws an exception on an invalid CoolingType. |
 | TC28 | Test Invalid AlertTarget for Alert Factory | Invalid AlertTarget (-1) | Throws std::invalid_argument exception | To verify the alert factory throws an exception on invalid AlertTarget input. |
 
-These rationales clarify why each test is essential to cover boundary conditions, expected behaviors, and error handling comprehensively.
