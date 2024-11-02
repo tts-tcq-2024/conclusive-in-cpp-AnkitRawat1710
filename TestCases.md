@@ -9,7 +9,7 @@ Each test cases are structured to validate:
 4. **Invalid Input Handling**: Tests that the system handles unexpected input values by throwing exceptions where appropriate.
 
 ---
-
+### **Introduction**
 | **Test Case ID** | **Test Description** | **Inputs** | **Expected Output** | **Rationale** |
 |------------------|----------------------|------------|---------------------|---------------|
 | TC01 | Test `inferBreach` with value below limit | Value = -5, Limits = (0, 35) | TOO_LOW | To confirm `inferBreach` correctly identifies temperatures lower than the allowable range as TOO_LOW. |
