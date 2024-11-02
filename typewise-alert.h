@@ -1,32 +1,50 @@
 #pragma once
+#include <memory>
+#include <string>
 
-typedef enum {
+enum CoolingType {
   PASSIVE_COOLING,
   HI_ACTIVE_COOLING,
   MED_ACTIVE_COOLING
-} CoolingType;
+};
 
-typedef enum {
+enum BreachType {
   NORMAL,
   TOO_LOW,
   TOO_HIGH
-} BreachType;
+};
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-
-typedef enum {
+enum AlertTarget {
   TO_CONTROLLER,
   TO_EMAIL
-} AlertTarget;
+};
 
-typedef struct {
+struct BatteryCharacter {
   CoolingType coolingType;
-  char brand[48];
-} BatteryCharacter;
+  std::string brand;
+};
 
-void checkAndAlert(
-  AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
+// Interface for Breach Classification Strategy
+class IBreachClassifier {
+public:
+  virtual ~IBreachClassifier() = default;
+  virtual BreachType classify(double temperatureInC) const = 0;
+};
 
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+// Interface for Alert Strategy
+class IAlert {
+public:
+  virtual ~IAlert() = default;
+  virtual void send(BreachType breachType) const = 0;
+};
+
+// Factory function declarations for creating breach classifiers and alerts
+std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingType);
+std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget);
+
+// Core function that checks the temperature and sends an alert if needed
+void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
+
+// Utility function that infers the breach type based on given limits
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+
