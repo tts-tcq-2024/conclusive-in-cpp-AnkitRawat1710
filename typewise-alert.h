@@ -38,13 +38,13 @@ public:
   virtual void send(BreachType breachType) const = 0;
 };
 
-// Factory function declarations
+// Factory function declarations for creating breach classifiers and alerts
 std::unique_ptr<IBreachClassifier> createBreachClassifier(CoolingType coolingType);
 std::unique_ptr<IAlert> createAlert(AlertTarget alertTarget);
 
-// Core function
+// Core function that checks the temperature and sends an alert if needed
 void checkAndAlert(AlertTarget alertTarget, const BatteryCharacter& batteryChar, double temperatureInC);
 
-// Utility function
+// Utility function that infers the breach type based on given limits
 BreachType inferBreach(double value, double lowerLimit, double upperLimit);
 
