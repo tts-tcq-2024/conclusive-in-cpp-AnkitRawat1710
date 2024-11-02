@@ -46,6 +46,7 @@ TEST(TypeWiseAlertTestSuite, MedActiveCoolingBreachLevels) {
     checkAndAlert(TO_EMAIL, battery, 40);        // Boundary: Upper limit NORMAL
 }
 
+// Tests the alert mechanism by sending different breach types to both the controller and email alert systems.
 TEST(TypeWiseAlertTestSuite, AlertMechanismBreachTypes) {
     auto controllerAlert = createAlert(AlertTarget::TO_CONTROLLER);
     controllerAlert->send(BreachType::TOO_LOW);    // TOO_LOW to controller
